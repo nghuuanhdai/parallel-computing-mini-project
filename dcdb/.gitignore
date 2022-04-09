@@ -1,0 +1,43 @@
+## Ignore DCDB dependency and install paths
+deps/
+install/
+
+## Ignore DCDB generated documentation
+doc/html
+doc/dcdb_documentation.html
+doc/dox_stderr.txt
+
+## Ignore object files and other binaries
+*.o
+*.so
+*.dylib
+collectagent/collectagent
+dcdbpusher/dcdbpusher
+tools/dcdbconfig/dcdbconfig
+tools/dcdbcsvimport/dcdbcsvimport
+tools/dcdbquery/dcdbquery
+tools/dcdbquerysum/dcdbquerysum
+tools/dcdbslurmjob/dcdbslurmjob
+tools/dcdbunitconv/dcdbunitconv
+grafana/grafanaserver
+
+## Ignore various IDE project definition files
+.cproject
+.project
+.settings
+*.xcodeproj
+*.xcworkspace/
+
+## Ignore debug symbol directories
+*.dSYM
+
+## Ignore directory indexing tools
+cscope.out
+.DS_Store
+
+## Ignore temp files
+*~
+.header-check
+
+## Ignore log files
+*.log

@@ -1,0 +1,126 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:        dcdb
+# Required-Start:  $network $remote_fs $syslog $time ntpd
+# Required-Stop:   $network $remote_fs $syslog
+# Default-Start:   2 3 4 5
+# Default-Stop:    1
+# Short-Description: Start DCDB stack (Cassandra, CollectAgent)
+### END INIT INFO
+
+# Time to wait before giving up on bringing up a service
+SERVICE_TIMEOUT=180
+
+MQTT_HOST=0.0.0.0
+MQTT_PORT=1883
+HTTP_HOST=0.0.0.0
+HTTP_PORT=8080
+CASSANDRA_HOST=127.0.0.1
+CASSANDRA_PORT=9042
+
+DCDB_PREFIX=%DCDB_PREFIX%
+PATH=${PATH}:/bin:/usr/bin:${DCDB_PREFIX}/bin:${DCDB_PREFIX}/cassandra/bin
+
+. /lib/lsb/init-functions
+
+LD_LIBRARY_PATH=${DCDB_PREFIX}/lib/
+
+LOCKFILE=${DCDB_PREFIX}/lock
+CASSANDRA_PID_FILE=${DCDB_PREFIX}/cassandra.pid
+
+lock_dcdb() {
+        if [ -x /usr/bin/lockfile-create ]; then
+                lockfile-create $LOCKFILE
+                lockfile-touch $LOCKFILE &
+                LOCKTOUCHPID="$!"
+        fi
+}
+
+unlock_dcdb() {
+        if [ -x /usr/bin/lockfile-create ] ; then
+                kill $LOCKTOUCHPID
+                lockfile-remove $LOCKFILE
+        fi
+}
+
+wait_for_listen_port() {
+	echo "Waiting for listening socket on port $1 ..."
+	R=0
+	E=0
+	while [ "$E" -eq "0" ]; do
+		R=`expr $R + 1`
+		if [ "$R" -gt "$SERVICE_TIMEOUT" ]; then
+			echo "Service did not come up in time. Exiting."
+			exit 3
+		fi
+		sleep 1
+		netstat -l --numeric --inet --inet6 | grep $1 > /dev/null
+		if [ "$?" -eq "0" ]; then
+			E=1
+		fi
+	done
+	echo "Port now open on port $1!"
+}
+
+case $1 in
+	start)
+		# Check if cassandra/collectagent are running
+		C=`ps aux | grep cassandra | grep -v grep`
+		if [ "$?" = "0" ]; then
+			echo "Cassandra already running, please stop the service first."
+			exit 3
+		fi
+		C=`ps aux | grep collectagent | grep -v grep`
+		if [ "$?" = "0" ]; then
+			echo "CollectAgent already running, please stop the service first."
+			exit 3
+		fi
+
+		echo "Starting DCDB..."
+		lock_dcdb
+
+		# Start Cassandra
+		cassandra -p $CASSANDRA_PID_FILE
+
+		# Wait till cassandra is up (port 9042 is native transport)
+		wait_for_listen_port $CASSANDRA_PORT
+
+		# Start CollectAgent (TTL for the data is 100 days)
+		#env LD_LIBRARY_PATH=$LD_LIBRARY_PATH collectagent -D -l 0.0.0.0 -h 127.0.0.1 -t 8640000
+		
+		# Start CollectAgent (no TTL)
+		#env LD_LIBRARY_PATH=$LD_LIBRARY_PATH collectagent -d -m $MQTT_HOST:$MQTT_PORT -c $CASSANDRA_HOST:$CASSANDRA_PORT -r $HTTP_HOST:$HTTP_PORT
+
+		# Start CollectAgent (use config file)
+        env LD_LIBRARY_PATH=$LD_LIBRARY_PATH collectagent -d ${DCDB_PREFIX}/etc/
+
+		# Wait till CollectAgent is up
+		wait_for_listen_port $MQTT_PORT
+
+		unlock_dcdb
+  		;;
+	stop)
+		echo "Stopping DCDB Service"
+		killall -s SIGINT collectagent
+		sleep 2
+		if [ -e $CASSANDRA_PID_FILE ]; then
+			kill `cat $CASSANDRA_PID_FILE`
+		fi
+  		;;
+	restart|force-reload)
+		$0 stop && sleep 5 && $0 start
+  		;;
+	reload)
+		exit 3
+		;;
+	status)
+		echo "Status not implemented."
+		exit 3
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart|status}"
+		exit 2
+		;;
+esac
+

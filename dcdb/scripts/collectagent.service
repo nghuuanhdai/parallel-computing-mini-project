@@ -1,0 +1,14 @@
+[Unit]
+Description=DCDB CollectAgent
+After=cassandra.service
+
+[Service]
+Environment=LD_LIBRARY_PATH=%DCDB_PREFIX%/lib
+ExecStart=%DCDB_PREFIX%/bin/collectagent %DCDB_PREFIX%/etc
+StandardOutput=journal
+StandardError=journal
+Restart=always
+
+
+[Install]
+WantedBy=multi-user.target

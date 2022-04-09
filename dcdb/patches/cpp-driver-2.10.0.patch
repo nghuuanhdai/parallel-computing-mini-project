@@ -1,0 +1,25 @@
+diff -ur cpp-driver-2.10.0-orig/cmake/modules/FindLibuv.cmake cpp-driver-2.10.0/cmake/modules/FindLibuv.cmake
+--- cpp-driver-2.10.0-orig/cmake/modules/FindLibuv.cmake	2018-10-10 14:48:43.000000000 +0200
++++ cpp-driver-2.10.0/cmake/modules/FindLibuv.cmake	2018-12-09 21:36:55.000000000 +0100
+@@ -53,7 +53,7 @@
+ find_library(LIBUV_LIBRARY
+   NAMES ${_LIBUV_NAMES}
+   ${_LIBUV_ROOT_HINTS_AND_PATHS}
+-  PATH_SUFFIXES lib
++  PATH_SUFFIXES lib build
+   NO_DEFAULT_PATH)
+ 
+ # Extract version number if possible.
+
+diff -ur distfiles/cpp-driver-2.10.0/cmake/modules/CppDriver.cmake cpp-driver-2.10.0/cmake/modules/CppDriver.cmake 
+--- distfiles/cpp-driver-2.10.0/cmake/modules/CppDriver.cmake	2018-10-10 14:48:43.000000000 +0200
++++ cpp-driver-2.10.0/cmake/modules/CppDriver.cmake	2019-06-04 20:00:24.768905545 +0200
+@@ -835,7 +835,7 @@
+   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+     # GCC specific compiler options
+     # I disabled long-long warning because boost generates about 50 such warnings
+-    set(WARNING_COMPILER_FLAGS "-Wall -pedantic -Wextra -Wno-long-long -Wno-unused-parameter -Wno-variadic-macros")
++    set(WARNING_COMPILER_FLAGS "-Wall -pedantic -Wextra -Wno-deprecated-copy -Wno-long-long -Wno-unused-parameter -Wno-variadic-macros")
+ 
+     if(CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "4.8" OR
+        CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.8")

@@ -1,0 +1,13 @@
+[Unit]
+Description=DCDB Pusher
+After=collectagent.service
+
+[Service]
+Environment=LD_LIBRARY_PATH=/usr/lib64/dcdb/
+ExecStart=/usr/bin/dcdbpusher /etc/dcdb/
+StandardOutput=journal
+StandardError=journal
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,78 @@
+--- freeipmi-1.6.3/Makefile.am	2018-07-31 01:07:25.000000000 +0200
++++ freeipmi-1.6.3/Makefile.am	2019-06-08 10:47:08.139423052 +0200
+@@ -3,35 +3,7 @@
+ ACLOCAL_AMFLAGS = -I config
+ 
+ SUBDIRS = \
+-	doc \
+-	etc \
+-	common \
+-	libfreeipmi \
+-	libipmiconsole \
+-	libipmimonitoring \
+-	libipmidetect \
+-	man \
+-	bmc-info \
+-	bmc-device \
+-	bmc-watchdog \
+-	ipmi-chassis \
+-	ipmi-config \
+-	ipmi-dcmi \
+-	ipmi-fru \
+-	ipmi-oem \
+-	ipmi-pet \
+-	ipmi-raw \
+-	ipmi-sel \
+-	ipmi-sensors \
+-	ipmi-locate \
+-	ipmiconsole \
+-	ipmidetect \
+-	ipmidetectd \
+-	ipmiping \
+-	ipmipower \
+-	ipmiseld \
+-	rmcpping \
+-	contrib
++	libfreeipmi
+ 
+ PACKAGE = @PACKAGE@
+ VERSION = @VERSION@
+--- freeipmi-1.6.3/Makefile.in	2019-01-24 00:22:16.000000000 +0100
++++ freeipmi-1.6.3/Makefile.in	2019-06-08 10:46:38.879029494 +0200
+@@ -417,35 +417,7 @@
+ # include directory for aclocal
+ ACLOCAL_AMFLAGS = -I config
+ SUBDIRS = \
+-	doc \
+-	etc \
+-	common \
+-	libfreeipmi \
+-	libipmiconsole \
+-	libipmimonitoring \
+-	libipmidetect \
+-	man \
+-	bmc-info \
+-	bmc-device \
+-	bmc-watchdog \
+-	ipmi-chassis \
+-	ipmi-config \
+-	ipmi-dcmi \
+-	ipmi-fru \
+-	ipmi-oem \
+-	ipmi-pet \
+-	ipmi-raw \
+-	ipmi-sel \
+-	ipmi-sensors \
+-	ipmi-locate \
+-	ipmiconsole \
+-	ipmidetect \
+-	ipmidetectd \
+-	ipmiping \
+-	ipmipower \
+-	ipmiseld \
+-	rmcpping \
+-	contrib
++	libfreeipmi
+ 
+ EXTRA = \
+ 	ChangeLog \

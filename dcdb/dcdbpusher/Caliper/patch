@@ -1,0 +1,69 @@
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -6,7 +6,7 @@ else()
+   set(CMAKE_C_STANDARD_REQUIRED ON)
+   set(CMAKE_CXX_STANDARD_REQUIRED ON) 
+ 
+-  set(CMAKE_CXX_STANDARD 11)
++  set(CMAKE_CXX_STANDARD 17)
+   set(CMAKE_C_STANDARD   99)
+ endif()
+ 
+--- a/src/services/CMakeLists.txt	2019-06-07 10:33:20.036516054 +0200
++++ b/src/services/CMakeLists.txt	2019-06-06 17:57:54.096623744 +0200
+@@ -55,6 +55,7 @@
+   add_subdirectory(cupti)
+   add_subdirectory(cuptitrace)
+ endif()
++add_subdirectory(dcdbpusher)
+ add_subdirectory(debug)
+ add_subdirectory(env)
+ add_subdirectory(event)
+
+--- a/src/services/timestamp/Timestamp.cpp
++++ b/src/services/timestamp/Timestamp.cpp
+@@ -208,7 +208,8 @@ class Timestamp
+ 
+         if (record_timestamp && (scope & CALI_SCOPE_PROCESS))
+             sbuf->append(timestamp_attr.id(),
+-                         Variant(cali_make_variant_from_uint(chrono::system_clock::to_time_t(chrono::system_clock::now()))));
++                         Variant(cali_make_variant_from_uint(
++                                 chrono::duration_cast<chrono::nanoseconds>(chrono::system_clock::now().time_since_epoch()).count())));
+     }
+ 
+     void post_init_cb(Caliper* c, Channel* chn) {
+
+--- a/src/caliper/Caliper.cpp
++++ b/src/caliper/Caliper.cpp
+@@ -267,15 +267,15 @@ struct Caliper::ThreadData
+ 
+     ~ThreadData() {
+         {
+-            Caliper c;
+-            c.release_thread();
++//            Caliper c;
++//            c.release_thread();
+         }
+         
+         if (is_initial_thread)
+             Caliper::release();
+             
+-        if (Log::verbosity() >= 2)
+-            print_detailed_stats( Log(2).stream() );
++//        if (Log::verbosity() >= 2)
++//            print_detailed_stats( Log(2).stream() );
+     }
+ 
+     void print_detailed_stats(std::ostream& os) {
+
+--- a/src/caliper/config_sanity_check.cpp
++++ b/src/caliper/config_sanity_check.cpp
+@@ -45,7 +45,7 @@ namespace
+ 
+ const char* trigger_grp[] = { "event", "sampler", "libpfm", "alloc", nullptr };
+ const char* buffer_grp[]  = { "aggregate", "trace", nullptr };
+-const char* process_grp[] = { "aggregate", "trace", "textlog", nullptr };
++const char* process_grp[] = { "aggregate", "trace", "textlog", "dcdbpusher", nullptr };
+ const char* online_grp[]  = { "textlog", nullptr };
+ const char* offline_grp[] = { "recorder", "report", "sos", "mpireport", nullptr };
+

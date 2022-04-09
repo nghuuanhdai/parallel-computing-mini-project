@@ -1,0 +1,12 @@
+prefix=/home/nnhhaadd/DCDB/install
+exec_prefix=${prefix}
+libdir=/home/nnhhaadd/DCDB/install/lib
+includedir=/home/nnhhaadd/DCDB/install/include
+
+Name: libuv
+Version: 1.38.1
+Description: multi-platform support library with a focus on asynchronous I/O.
+URL: http://libuv.org/
+
+Libs: -L${libdir} -luv -lpthread -ldl -lrt
+Cflags: -I${includedir}

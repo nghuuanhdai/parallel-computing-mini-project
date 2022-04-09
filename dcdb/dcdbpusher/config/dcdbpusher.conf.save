@@ -1,0 +1,44 @@
+global {
+	mqttBroker 127.0.0.1:1883
+	mqttprefix /test
+	threads 24
+	maxMsgNum 100
+	verbosity 5
+	daemonize false
+	tempdir	.
+	cacheInterval 120
+	qosLevel 1
+}
+
+restAPI {
+    address     127.0.0.1:8000
+    certificate ../../deps/openssl-1.1.1c/test/certs/ca-cert.pem
+    privateKey  ../../deps/openssl-1.1.1c/test/certs/ca-key.pem
+    dhFile      ../../deps/openssl-1.1.1c/crypto/dh/dh2048.pem
+
+    user admin {
+	password d033e22ae348aeb5660fc2140aec35850c4da997
+        PUT
+        GET
+    }
+
+    user asdf {
+        password 8c829ee6a1ac6ffdbcf8bc0ad72b73795fff34e8
+        GET
+    }
+}
+
+plugins {
+
+ plugin perfevent {
+        path    ./
+        config
+  
+}
+
+operatorPlugins {
+	operatorPlugin smoothing {
+		config 
+	
+	}
+}

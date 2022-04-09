@@ -1,0 +1,22 @@
+--- IntelOPA-Basic.SLES124-x86_64.10.10.0.0.445/IntelOPA-Tools.SLES124-x86_64.10.10.0.0.445/RPMS/x86_64/usr/include/opamgt/opamgt.h	2019-11-22 14:31:35.000000000 +0100
++++ IntelOPA-Basic.SLES124-x86_64.10.10.0.0.445/IntelOPA-Tools.SLES124-x86_64.10.10.0.0.445/RPMS/x86_64/usr/include/opamgt/opamgt.h	2019-11-22 14:45:42.000000000 +0100
+@@ -39,8 +39,8 @@
+ #include <stdint.h>
+ #include <stdio.h>
+ #include <iba/stl_types.h>
+-#include <infiniband/umad.h>
+-#include <infiniband/verbs.h>
++//#include <infiniband/umad.h>
++//#include <infiniband/verbs.h>
+ 
+ typedef uint32_t OMGT_STATUS_T;
+ 
+@@ -69,6 +69,8 @@
+ 
+ #define OMGT_STATUS_COUNT                   0x16 /* should be the last value */
+ 
++#define UMAD_CA_NAME_LEN 20
++#define IBV_SYSFS_NAME_MAX 64
+ 
+ /* opaque data defined internally */
+ struct omgt_port;

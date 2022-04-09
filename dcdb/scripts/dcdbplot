@@ -1,0 +1,210 @@
+#/bin/bash
+
+OUTFILE=""
+TMP=""
+INFILETMP=0
+
+ZEROOFFSET=0
+LINES="lines"
+SMOOTH=""
+CLEANTEMP=1
+LOCALTIME=0
+XRES=1024
+YRES=768
+
+if [ "$#" -ge "1" ]; then
+	while [ "${1:0:1}" == "-" ]; do
+		case ${1:1:1} in
+			p)  LINES="linespoints"
+				;;
+			b)	SMOOTH="smooth bezier"
+				;;
+			c)	SMOOTH="smooth csplines"
+				;;
+			z)	ZEROOFFSET=1
+				;;
+			t)	CLEANTEMP=0
+				;;
+			l)	LOCALTIME=1
+				;;
+			*)	echo "Unknown Parameter $1"
+				;;
+		esac
+		shift
+	done
+fi
+	
+if [ -t 0 ]; then
+	if [ "$#" -lt "1" ]; then
+		echo "Usage: dcdbplot [options] [infile] [outfile] [[xRes] [yRes]]"
+		echo ""
+		echo "Parameters:"
+		echo "   infile     CSV input data, may be piped from stdin"
+		echo "   outfile    optional PNG output file (X11 is default output)"
+		echo "   xRes, yRes resolution when writing to file (default: 1024x786)"
+		echo ""
+		echo "   -p         Mark points in graph"
+		echo "   -b         Smooth graph with Bezier curves"
+		echo "   -c         Smooth graph with csplines"
+		echo "   -z         Start y-axis at 0"
+		echo "   -t         Don't clean temporary files"
+		echo "   -l         Print timestamps as local time"
+		exit
+	fi
+	INFILE=$1
+	if [ "$#" -gt "1" ]; then
+		OUTFILE=$2
+	fi
+	if [ "$#" -gt "3" ]; then
+		XRES=$3
+		YRES=$4
+	fi
+else
+	INFILETMP=1
+	INFILE=$(mktemp)
+	while read -r i; do
+		echo "$i" >> ${INFILE}
+	done
+	if [ "$#" -gt "0" ]; then
+		OUTFILE=$1
+	fi
+	if [ "$#" -gt "2" ]; then
+                XRES=$2
+                YRES=$3
+        fi
+fi
+
+echo "Outfile: $OUTFILE"
+
+# Check that file exists
+if [ ! -e $INFILE ]; then
+	echo "File $INFILE does not exist."
+	exit
+fi
+
+# Create tmp dir
+TMP=`mktemp -d dcdbplot.XXXXXX`
+
+# Get length of file
+L=`cat $INFILE | wc -l`
+L=$(($L-1))
+
+# Check that the infile uses raw timestamps
+tail -n 1 $INFILE | awk -F "," '{printf("%s\n", $2)}' | grep T > /dev/null
+if [ "$?" -eq "0" ]; then
+	echo "Error: Please run dcdbquery with the -r option to get raw timestamps!"
+	exit 2
+fi
+
+# Check for the contained sensor names
+S=`tail -n $L $INFILE | awk -F "," '{printf("%s\n", $1)}' | uniq`
+echo "Found sensors:"
+echo "$S"
+
+# Create a file for each sensor
+A=0
+while read -r i; do
+	echo "Creating $TMP/$i".dat
+	grep "$i" $INFILE > "$TMP/$i".dat
+	A=$((A+1))
+done <<< "$S"
+
+# Find the smallest time stamp
+U=0
+if [ "$LOCALTIME" != "1" ]; then 
+	U="2999999999999999999"
+	while read -r i; do
+		T=`head -n1 $TMP/${i}.dat | awk -F "," '{print $2}'`
+		echo "$T" | grep ":" > /dev/null
+		echo "$TMP/${i}.dat starts at: $T"
+		if [ "$T" -lt "$U" ]; then
+			U="$T"
+		fi
+	done <<< "$S"
+	echo "Plot starts at: $U"
+fi
+
+# Write new data files with updated time stamps
+while read -r i; do
+	cat $TMP/${i}.dat | awk -F "," '{printf("%s,%f,%s\n",$1,($2-'$U')/1000000000,$3)}' > $TMP/${i}.dat2
+done <<< "$S"
+
+# Generate Plot File (general stuff)
+cat > $TMP/plot.gplt << EOF
+# GNUPlot file for visualizing dcdbqueries
+
+set title 'DEEP RAS Monitor'
+set xlabel "Time (sec)"
+set ylabel ""
+
+set border linewidth 1.5
+
+set datafile separator ","
+
+EOF
+
+# Generate Plot File (output config)
+if [ ! -z "$OUTFILE" ]; then
+	cat >> $TMP/plot.gplt << EOF
+
+set terminal png size $XRES,$YRES
+set output '$OUTFILE'
+EOF
+fi
+
+if [ "$LOCALTIME" == "1" ]; then
+	cat >> $TMP/plot.gplt << EOF
+set xdata time
+set timefmt "%s"
+set format x "%H:%M:%S\n%d/%m/%Y"
+EOF
+fi
+
+
+if [ "$ZEROOFFSET" == "1" ]; then
+	echo "set yrange [0:]" >> $TMP/plot.gplt
+fi
+
+# Generate Plot File (plot data)
+cat >> $TMP/plot.gplt << EOF
+plot \\
+EOF
+
+while read -r i; do
+	# Generate escaped title
+	T=`echo "$i" | sed -e 's/_/\\\\_/g'`
+	echo -n "'$TMP/${i}.dat2' using 2:3 title '$T' with $LINES $SMOOTH" >> $TMP/plot.gplt
+	if [ "$A" -gt "1" ]; then
+		echo ", \\" >> $TMP/plot.gplt
+        else
+                echo "" >> $TMP/plot.gplt
+	fi
+	A=$((A-1))
+done <<< "$S"
+cat >> $TMP/plot.gplt << EOF
+
+
+EOF
+
+# Generate Plot File (wait if interactive)
+if [ -z "$OUTFILE" ]; then
+	cat >> $TMP/plot.gplt << EOF
+pause -1
+EOF
+fi
+
+# Show Plot
+G=`which gnuplot44`
+if [ ! "$G" = "" ]; then
+  gnuplot44 --persist $TMP/plot.gplt >/dev/null
+else
+  gnuplot --persist $TMP/plot.gplt >/dev/null
+fi
+
+# Delete tmp dir
+if [ "$CLEANTEMP" == "1" ]; then
+  rm -rf $TMP
+  if [ "$INFILETMP" -gt "0" ]; then
+	rm $INFILE
+  fi
+fi

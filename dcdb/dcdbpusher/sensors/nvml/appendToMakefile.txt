@@ -1,0 +1,13 @@
+Inside the config.mk (inside the dcdb directory) append to PLUGINS variable: nvml
+
+#Other plugins to be built
+PLUGINS = sysfs perfevent ipmi pdu bacnet snmp procfs tester gpfsmon opa msr nvml
+ 
+Then Append at end of Makefile (inside the dcdbpusher directory):
+
+# nvcc compiler and extra flags to enable the linking and creating of .so file to work: 
+
+libdcdbplugin_nvml.$(LIBEXT): sensors/nvml/nvmlSensorGroup.o sensors/nvml/nvmlConfigurator.o
+	$(NVCC) -shared --compiler-options '-fPIC'  -o $@ $^ -L$(DCDBDEPLOYPATH)/lib/ -lboost_log -lboost_system -lnvidia-ml
+
+

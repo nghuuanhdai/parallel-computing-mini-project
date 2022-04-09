@@ -1,0 +1,14 @@
+[Unit]
+Description=Cassandra
+After=network.target
+
+[Service]
+PIDFile=%DCDB_PREFIX%/cassandra.pid
+ExecStart=%DCDB_PREFIX%/cassandra/bin/cassandra -p %DCDB_PREFIX%/cassandra.pid
+StandardOutput=journal
+StandardError=journal
+Restart=always
+
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,96 @@
+This DCDB plugin uses the NVML library to capture the following GPU metrics:
+
+
+* Power - sensor /test/nvml/power 
+	Uses the nvmlDeviceGetPowerUsage function to retrieve power usage 
+	for this GPU in milliwatts and its associated circuitry (e.g. memory).
+
+ 
+* Temperature - sensor /test/nvml/temp 
+	Uses the nvmlDeviceGetTemperature function to retrieve the current 
+	temperature readings for the device, in degrees C.
+
+
+* Energy - sensor /test/nvml/energy
+	Uses the nvmlDeviceGetTotalEnergyConsumption function to retrieve total 
+	energy consumption for this GPU in millijoules (mJ) since the driver was 
+	last reloaded.
+
+
+* Running Compute Processes - sensor /test/nvml/run_prcs
+	Set up to use the nvmlDeviceGetComputeRunningProcesses function to get
+	the number of running processes with a compute context (e.g. CUDA 
+	application which have active context) on the device.
+
+
+* ECC errors - sensor /test/nvml/ecc_errors
+	Set up to use the nvmlDeviceGetTotalEccErrors function to retrieve the 
+	NVML_MEMORY_ERROR_TYPE_CORRECTED type errors (a memory error that was 
+	corrected for ECC errors; these are single bit errors for Texture memory; 
+	these are errors fixed by resend) for the NVML_VOLATILE_ECC counter 
+	(Volatile counts are reset each time the driver loads). 
+
+	Requires ECC Mode to be enabled.  
+
+ 
+* Graphics Clock speed - sensor /test/nvml/clock_graphics
+	Set up to use the nvmlDeviceGetClock function to retrieves the clock speed 
+	(current actual clock value) for the graphics clock domain in MHz.  
+
+
+* SM Clock speed - sensor /test/nvml/clock_sm
+	Set up to use the nvmlDeviceGetClock function to retrieves the clock speed 
+        (current actual clock value) for the SM clock domain in MHz.
+
+
+* Memory Clock speed - sensor /test/nvml/clocl_mem
+	Set up to use the nvmlDeviceGetClock function to retrieves the clock speed 
+        (current actual clock value) for the memory clock domain in MHz.
+
+
+* Total memory - sensor /test/nvml/memory_tot
+	Set up to use the nvmlDeviceGetMemoryInfo function to retrieve the amount 
+	of total memory available on the device, in bytes.
+
+
+* Free memory - sensor /test/nvml/memory_free
+	Set up to use the nvmlDeviceGetMemoryInfo function to retrieve the amount 
+        of free memory available on the device, in bytes.
+
+
+* Used memory - sensor /test/nvml/memory_used 
+	Set up to use the nvmlDeviceGetMemoryInfo function to retrieve the amount 
+        of used memory on the device, in bytes.
+
+
+* Memory utilisation rate - sensor /test/nvml/util_mem
+	Set up to use the nvmlDeviceGetUtilizationRates function to retrieve the 
+	current utilization rates for the memory subsystem. It's reported as a 
+	percent of time over the past sample period during which global (device) 
+	memory was being read or written.
+
+
+* GPU utlisation - sensor /test/nvml/util_gpu
+	Set up to use the nvmlDeviceGetUtilizationRates function to retrieve the 
+	current utilization rates for the gpu. It's reported as a percent of time 
+	over the past sample period during which one or more kernels was executing 
+	on the GPU. 
+
+
+* PCIe throughput - sensor /test/nvml/pcie_thru
+	Set up to use the DeviceGetPcieThroughput function to retrieve the PCIe 
+	utilization information. This function is querying a byte counter over a 
+	20ms interval and thus is the PCIe throughput (NVML_PCIE_UTIL_COUNT) over 
+	that interval. The throughput is returned in KB/s.
+
+	Other possible counters are: NVML_PCIE_UTIL_TX_BYTES (transmitted bytes) 
+	and NVML_PCIE_UTIL_RX_BYTES (received bytes).
+
+
+* Fan - sensor /test/nvml/fan
+	Set up to use the nvmlDeviceGetFanSpeed funtion to retrieve the intended 
+	operating speed of the device's fan. The fan speed is expressed as a percent
+	of the maximum, i.e. full speed is 100%. 
+ 
+
+ 

@@ -1,0 +1,34 @@
+<query-editor-row query-ctrl="ctrl" class="generic-datasource-query-row" has-text-edit-mode="true" can-collapse="true">
+
+  <div ng-if="!ctrl.target.rawQuery">
+
+    <div class="gf-form-inline">
+      <div class="gf-form">
+        <label class="gf-form-label query-keyword width-7">QUERY</label>
+
+          <div class="gf-form">
+            <label class="gf-form-label query-keyword width-5">Level</label>
+              <gf-form-dropdown 
+                ng-repeat="lev in ctrl.target.levels track by $index" 
+                model="ctrl.target.levels[$index]"
+                allow-custom="true"
+                lookup-text="true"
+                get-options="ctrl.getOptions($query, $index)"
+                on-change="ctrl.onChangeInternal($index)">
+              </gf-form-dropdown>
+          </div>
+
+            <div class="gf-form">
+              <label class="gf-form-label query-keyword width-5">Sensor</label>
+                <gf-form-dropdown 
+                  model="ctrl.target.sensor"
+                  allow-custom="true"
+                  lookup-text="true"
+                  get-options="ctrl.getOptions($query,-1)"
+                  on-change="ctrl.onChangeInternal(-1)">
+                </gf-form-dropdown>
+            </div>
+      </div>
+    </div>
+  </div>
+</query-editor-row>

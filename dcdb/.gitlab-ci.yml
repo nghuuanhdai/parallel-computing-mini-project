@@ -1,0 +1,32 @@
+stages:
+  - build_deps
+  - install_deps
+  - build_all
+  - install_all
+  
+after_script: 
+  - make clean
+  
+build_deps:
+  stage: build_deps
+  only:
+    - master
+  script: make deps
+  
+install_deps:
+  stage: install_deps
+  only:
+    - master
+  script: make depsinstall
+  
+build_all:
+  stage: build_all
+  only:
+    - master
+  script: make all
+  
+install_all:
+  stage: install_all
+  only:
+    - master
+  script: make install

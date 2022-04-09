@@ -1,0 +1,35 @@
+{
+  "name": "DCDB",
+  "id": "grafana-dcdb-datasource",
+  "type": "datasource",
+
+  "partials": {
+    "config": "public/app/plugins/datasource/dcdb/partials/config.html"
+  },
+
+  "metrics": true,
+  "annotations": true,
+
+  "info": {
+    "description": "data source plugin based on the JSON datasource for DCDB",
+    "author": {
+      "name": "DanielSan",
+      "url": "https://dcdb.it"
+    },
+    "logos": {
+      "small": "img/quokka.jpg",
+      "large": "img/quokka.jpg"
+    },
+    "links": [
+      {"name": "GitHub", "url": "https://dcdb.it"},
+      {"name": "MIT License", "url": "https://github.com/grafana/simple-json-datasource/blob/master/LICENSE"}
+    ],
+    "version": "0.0.1",
+    "updated": "2019-03-20"
+  },
+
+  "dependencies": {
+    "grafanaVersion": "6.2.2",
+    "plugins": [ ]
+  }
+}

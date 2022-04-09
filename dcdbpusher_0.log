@@ -1,0 +1,6 @@
+2 [2022-04-05, 19:12:06] 0x00007f42f24c5740 <info>: Logging setup complete
+3 [2022-04-05, 19:12:06] 0x00007f42f24c5740 <info>: Loading plugin perfevent...
+4 [2022-04-05, 19:12:06] 0x00007f42f24c5740 <info>: install/etc/perfevent.conf found
+5 [2022-04-05, 19:12:06] 0x00007f42f24c5740 <error>: Cannot load perfevent-library: ./libdcdbplugin_perfevent.so: cannot open shared object file: No such file or directory
+6 [2022-04-05, 19:12:06] 0x00007f42f24c5740 <error>: Could not load plugin perfevent
+7 [2022-04-05, 19:12:06] 0x00007f42f24c5740 <fatal>: Failed to read configuration!
